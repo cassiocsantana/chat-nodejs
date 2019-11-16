@@ -1,12 +1,12 @@
 const net = require("net");
 const readLine = require("readline");
 
-//Definição das variaveis
-
+//Define Var
+let Clients = [];
 let AdressIPServer = "";
 let AdressPORTServer = "";
-
-//Criação da Interface de leitura
+let sender = Clients;
+// Create interface of read
 
 const rl = readLine.createInterface({
   input: process.stdin,
@@ -16,11 +16,35 @@ const rl = readLine.createInterface({
 // set param socket
 
 const handleConnetion = async socket => {
-  let remoteAddress = socket.remoteAddress + ":" + socket.remotePort;
-  console.log("Nova conexão de:", remoteAddress);
+  socket.name = socket.remoteAddress + ":" + socket.remotePort;
+  // Add client of the list
+  Clients.push(socket);
+
+  console.log("Nova conexão de:", socket);
   socket.setEncoding("utf8");
-  socket.on("data", data => console.log(data.toString()));
-  socket.on("end", () => console.log(remoteAddress, "desconectou-se"));
+
+  // Handle incoming messages from clients.
+  socket.on("data", function(data) {
+    broadcast("\n" + data.toString(), socket);
+  });
+
+  // Remove the client from the list when it leaves
+  socket.on("end", function() {
+    Clients.splice(Clients.indexOf(socket), 1);
+    broadcast(socket.name + " Deixou a conversa.\n");
+  });
+
+  function broadcast(message, sender) {
+    Clients.forEach(function(client) {
+      // Tratamento para nao enviar a mesma mensagem a quem originou
+      if (client === sender) return;
+      client.write(message);
+    });
+    // Envia a mensagem na console
+    process.stdout.write(message);
+  }
+
+  broadcast(socket.name + " conectado ao servidor\n", socket);
 };
 
 const server = net.createServer(handleConnetion);
@@ -60,3 +84,9 @@ function set_server(IPServer, PortServer) {
 }
 
 load_server();
+
+// socket.on("data", data => console.log(data.toString()));
+
+// socket.on("myEvent", function(message) {
+//   socket.write(message);
+// });

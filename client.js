@@ -39,20 +39,24 @@ function set_config_client(IPServer, PortServer, user) {
   const client = new net.Socket();
   client.connect(PortServer, IPServer, () => {
     rl.addListener("line", line => {
-      client.write(user + ": " + line);
+      client.write(user + " > " + line);
     });
+  });
+
+  client.on("data", function(data) {
+    client.write(data.toString());
   });
 
   client.on("end", () => {
     console.log("Servidor Desconectou");
-    client.close();
+    //client.close();
   });
 
   client.on("error", function(e) {
     if (e.code == "EADDRINUSE") {
       console.log("Tentando conectar, carregando...");
       setTimeout(function() {
-        client.close();
+        //client.close();
         client.connect(PortServer, IPServer);
       });
     }
