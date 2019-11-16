@@ -5,7 +5,7 @@ const readLine = require("readline");
 let Clients = [];
 let AdressIPServer = "";
 let AdressPORTServer = "";
-let sender = Clients;
+
 // Create interface of read
 
 const rl = readLine.createInterface({
