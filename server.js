@@ -19,19 +19,21 @@ const handleConnetion = async socket => {
   socket.name = socket.remoteAddress + ":" + socket.remotePort;
   // Add client of the list
   Clients.push(socket);
-
-  console.log("Nova conexão de:", socket);
+  broadcast(socket.name + " Conectou no Chat");
   socket.setEncoding("utf8");
 
   // Handle incoming messages from clients.
   socket.on("data", function(data) {
-    broadcast("\n" + data.toString(), socket);
+    broadcast(data.toString(), socket);
+  });
+  server.getConnections(function(err, count) {
+    console.log(socket.name + count);
   });
 
   // Remove the client from the list when it leaves
   socket.on("end", function() {
     Clients.splice(Clients.indexOf(socket), 1);
-    broadcast(socket.name + " Deixou a conversa.\n");
+    broadcast(socket.name + " > Deixou a conversa.\n", socket);
   });
 
   function broadcast(message, sender) {
@@ -41,14 +43,11 @@ const handleConnetion = async socket => {
       client.write(message);
     });
     // Envia a mensagem na console
-    process.stdout.write(message);
+    process.stdout.write(message + "\n");
   }
-
-  broadcast(socket.name + " conectado ao servidor\n", socket);
 };
 
 const server = net.createServer(handleConnetion);
-server.on("error", err => console.log("Erro ao iniciar servidor!"));
 
 // Inicio Da leitura
 
@@ -63,14 +62,10 @@ async function questions() {
   AdressPORTServer = await ask("INFORME A PORTA: ");
 }
 
-async function load_server() {
-  await questions();
-  await set_server(AdressIPServer, AdressPORTServer);
-}
-
 function set_server(IPServer, PortServer) {
   if (IPServer && PortServer) {
     server.listen(PortServer, IPServer);
+
     server.on("error", function(e) {
       if (e.code == "EADDRINUSE") {
         console.log("Endereço sendo usado, carregando...");
@@ -83,10 +78,9 @@ function set_server(IPServer, PortServer) {
   }
 }
 
+async function load_server() {
+  await questions();
+  await set_server(AdressIPServer, AdressPORTServer);
+}
+
 load_server();
-
-// socket.on("data", data => console.log(data.toString()));
-
-// socket.on("myEvent", function(message) {
-//   socket.write(message);
-// });

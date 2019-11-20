@@ -4,12 +4,10 @@ const readline = require("readline");
 let AdressIPServer = "";
 let AdressPORTServer = "";
 let User = "";
+let Flag = true;
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-  // prompt: "You > "
-});
+const rl = readline.createInterface(process.stdin, process.stdout);
+rl.setPrompt(" You >");
 
 // Set Quetions
 
@@ -22,7 +20,7 @@ function ask(questionText) {
 // Questions
 
 async function questions() {
-  AdressIPServer = await ask("INFORME O IP DE SUA MAQUINA: ");
+  AdressIPServer = await ask("INFORME O IP DO SERVIDOR: ");
   AdressPORTServer = await ask("INFORME A PORTA: ");
   User = await ask("What is User? ");
 }
@@ -35,30 +33,27 @@ async function load_client() {
 load_client();
 
 function set_config_client(IPServer, PortServer, user) {
-  console.log("------------Chat--------------");
   const client = new net.Socket();
-  client.connect(PortServer, IPServer, () => {
-    rl.addListener("line", line => {
-      client.write(user + " > " + line);
-    });
+  console.log("------------Chat--------------");
+
+  client.connect(PortServer, IPServer, function() {
+    rl.prompt();
   });
 
   client.on("data", function(data) {
-    client.write(data.toString());
+    console.log(data.toString());
   });
 
-  client.on("end", () => {
-    console.log("Servidor Desconectou");
-    //client.close();
+  rl.on("line", function(line) {
+    client.write(user + ": " + line);
   });
 
-  client.on("error", function(e) {
-    if (e.code == "EADDRINUSE") {
-      console.log("Tentando conectar, carregando...");
-      setTimeout(function() {
-        //client.close();
-        client.connect(PortServer, IPServer);
-      });
-    }
+  client.on("close", function() {
+    console.log("Connection closed");
+    process.exit(0);
+  });
+
+  client.on("error", () => {
+    console.log("Verifique o ip e porta..");
   });
 }
