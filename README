@@ -1,0 +1,25 @@
+#############################################################################
+########################## CHAT TCP JAVASCRIP (NODE.JS)######################
+
+Este é um projeto simples visando o conhecimento de como funciona um socket TCP
+com Node, utilizando de frameworks nativos.
+
+#Pré-requisitos
+
+    *Necessário que tenho Node.js instalado em sua maquina.
+     caso não tem, acesse o site do node (https://nodejs.org/en/)
+     e faça o download. 
+
+     * Caso Utilize sistemas linux, também pode acessar este link (https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions-enterprise-linux-fedora-and-snap-packages)
+
+#Rodando Aplicação
+
+    Entre na Pasta onde esta os arquivos server.js e client.js e os execute com o comando 
+
+    > node server.js (Este para o servidor)
+    > node client.js (Este para o Cliente)
+estes comandos são o mesmos para windows, linux ou mac, todos devem ser executados no terminal. No caso do windows é precisso esta em modo administrador
+
+
+#Licença
+
